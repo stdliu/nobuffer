@@ -1,0 +1,47 @@
+#!/bin/bash
+
+PREFIX=${PREFIX:-#DEFAULT_PREFIX#}
+PRINT_EXPORT=0
+
+usage()
+{
+	cat <<-EOF
+	Usage: nobuffer [OPTION] [command [command arguments]]
+	Options:
+	  -e, --export                          Print export expression and exit.
+	  -p, --prefix  install_prefix_dir      Set install prefix dir.
+	  -h, --help                            Print this help message.
+	EOF
+	exit 1
+} >&2
+
+case $1 in
+	-h|--help) usage ;;
+	-p|--prefix)
+		PREFIX=$2
+		shift 2
+		;;
+	-e|--export)
+		PRINT_EXPORT=1
+		shift
+		;;
+esac
+
+
+if [ "$PREFIX" = '#'DEFAULT_PREFIX'#' ] ; then
+	LIBPATH=$PWD/libnobuffer.so
+else
+	LIBPATH=$PREFIX/lib/libnobuffer.so
+fi
+
+[ -n "$LD_PRELOAD" ] && LD_PRELOAD=":$LD_PRELOAD"
+export_expr="export LD_PRELOAD=$LIBPATH$LD_PRELOAD"
+
+((PRINT_EXPORT)) && echo "$export_expr" && exit
+
+[ -z "$1" ] && usage
+cmd=$1
+shift
+
+eval "$export_expr"
+$cmd "$@"
