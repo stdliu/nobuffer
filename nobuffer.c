@@ -50,7 +50,7 @@ static void initialize(void) {
 	if (stdout)
 		real_setvbuf(stdout, NULL, _IONBF, 0);
 	if (stderr)
-		real_setvbuf(stdout, NULL, _IONBF, 0);
+		real_setvbuf(stderr, NULL, _IONBF, 0);
 }
 
 void _init(void) { initialize(); }
